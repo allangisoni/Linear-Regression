@@ -6,6 +6,7 @@ library(DAAG)
 library(caret)
 library(gridExtra)
 library(dplyr)
+library(reshape2)
 
 theme_set(theme_bw())
 pacman::p_load(pacman, party, rio, tidyverse)
@@ -88,12 +89,30 @@ distPred
 print(linModel)
 summary(linModel)
 
-?rename
+
 # make actuals_predicteds dataframe.
 actuals_preds <- data.frame(cbind(actuals=testData$dist, predicteds=distPred))%>% 
   rename(actual_distance = actuals, predicted_distance = predicteds)
 
-              
+testData <- testData %>%
+            mutate(predicted_distance = actuals_preds$predicted_distance)
+
+dev.off()
+#testData <- melt(testData, id="speed")
+
+mlineplot <- ggplot(testData, aes(x=speed)) +
+             geom_line(aes(y=dist, col="plum")) +
+             geom_line(aes(y=predicted_distance, col="blue")) +
+             labs(
+                title = "Actual Distance vs Predicted Distance",
+                x ="Speed",
+                y = "Distance"
+                
+                
+              ) + theme(legend.position = "none")
+
+plot(mlineplot)
+
 correlation_accuracy <- cor(actuals_preds)  # 82.7%
 
 regr.eval(actuals_preds$actual_distance, actuals_preds$predicted_distance)
