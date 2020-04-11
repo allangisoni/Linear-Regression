@@ -5,7 +5,8 @@ library(DMwR)
 library(DAAG)
 library(caret)
 library(gridExtra)
-library(usethis)
+library(dplyr)
+
 theme_set(theme_bw())
 pacman::p_load(pacman, party, rio, tidyverse)
 
@@ -78,6 +79,9 @@ trainingData <- cars[trainingRowIndex, ]  # model training data
 testData  <- cars[-trainingRowIndex, ]   # test data
 
 linModel <- lm(dist~speed, data=trainingData)
+par(mfrow = c(2,2))
+plot(linModel)
+
 distPred <- predict(linModel, testData)
 distPred
 
@@ -92,7 +96,7 @@ actuals_preds <- data.frame(cbind(actuals=testData$dist, predicteds=distPred))%>
               
 correlation_accuracy <- cor(actuals_preds)  # 82.7%
 
-regr.eval(actuals_preds$actuals, actuals_preds$predicteds)
+regr.eval(actuals_preds$actual_distance, actuals_preds$predicted_distance)
 
 #k-fold cross validation
 # Define training control
